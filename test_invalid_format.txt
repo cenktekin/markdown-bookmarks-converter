@@ -1,0 +1,12 @@
+Bu geçersiz bir formattadır.
+Gerçek markdown formatı değildir.
+
+# Başlık
+- [Link](https://example.com)
+Bu bir link değildir.
+
+## Alt Başlık
+Normal metin
+content>
+<line_count>8</line_count>
+</write_to_file>

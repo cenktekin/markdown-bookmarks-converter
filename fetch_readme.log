@@ -1,0 +1,37 @@
+2025-08-15 21:23:54,631 - INFO - README fetch işlemi başlatıldı
+2025-08-15 21:23:54,631 - INFO - GitHub API'den README çekiliyor: https://api.github.com/repos/free-for-dev/free-for-dev/readme
+2025-08-15 21:23:55,038 - WARNING - API ile çekim başarısız: README.md dosyası bulunamadı
+2025-08-15 21:23:55,038 - INFO - Alternatif yöntem deneniyor...
+2025-08-15 21:23:55,038 - INFO - Doğrudan URL'den README çekiliyor: https://raw.githubusercontent.com/free-for-dev/free-for-dev/main/README.md
+2025-08-15 21:23:56,062 - ERROR - Alternatif yöntem de başarısız: HTTP 404: 404: Not Found
+2025-08-15 21:25:46,970 - INFO - README fetch işlemi başlatıldı
+2025-08-15 21:25:46,970 - INFO - GitHub API'den README çekiliyor: https://api.github.com/repos/ripienaar/free-for-dev/readme
+2025-08-15 21:25:47,745 - INFO - README başarıyla alındı. Boyut: 295068 karakter
+2025-08-15 21:25:47,746 - INFO - README başarıyla kaydedildi: /mnt/ee8bf59b-815d-47bd-b440-5ba8ae82ff4a/projects/free-for-dev/README.md
+2025-08-15 21:25:47,746 - INFO - README fetch işlemi başarıyla tamamlandı
+2025-08-15 21:26:05,428 - INFO - README fetch işlemi başlatıldı
+2025-08-15 21:26:05,428 - INFO - GitHub API'den README çekiliyor: https://api.github.com/repos/ripienaar/free-for-dev/readme
+2025-08-15 21:26:05,742 - INFO - README başarıyla alındı. Boyut: 295068 karakter
+2025-08-15 21:26:05,744 - INFO - README başarıyla kaydedildi: /mnt/ee8bf59b-815d-47bd-b440-5ba8ae82ff4a/projects/free-for-dev/README.md
+2025-08-15 21:26:05,744 - INFO - README fetch işlemi başarıyla tamamlandı
+2025-08-15 21:27:53,295 - INFO - README fetch işlemi başlatıldı
+2025-08-15 21:27:53,295 - INFO - Hedef repo: https://github.com/octocat/Hello-World
+2025-08-15 21:27:53,295 - INFO - Branch: main
+2025-08-15 21:27:53,295 - INFO - GitHub API'den README çekiliyor: https://api.github.com/repos/ripienaar/free-for-dev/readme
+2025-08-15 21:27:53,905 - INFO - README başarıyla alındı. Boyut: 295068 karakter
+2025-08-15 21:27:53,906 - INFO - README başarıyla kaydedildi: /mnt/ee8bf59b-815d-47bd-b440-5ba8ae82ff4a/projects/free-for-dev/README.md
+2025-08-15 21:27:53,906 - INFO - README fetch işlemi başarıyla tamamlandı
+2025-08-15 21:28:17,186 - INFO - README fetch işlemi başlatıldı
+2025-08-15 21:28:17,186 - INFO - Hedef repo: https://github.com/octocat/Hello-World
+2025-08-15 21:28:17,186 - INFO - Branch: main
+2025-08-15 21:28:17,186 - INFO - GitHub API'den README çekiliyor: https://api.github.com/repos/octocat/Hello-World/readme
+2025-08-15 21:28:17,640 - INFO - README başarıyla alındı. Boyut: 13 karakter
+2025-08-15 21:28:17,641 - INFO - README başarıyla kaydedildi: /mnt/ee8bf59b-815d-47bd-b440-5ba8ae82ff4a/projects/free-for-dev/README.md
+2025-08-15 21:28:17,641 - INFO - README fetch işlemi başarıyla tamamlandı
+2025-08-15 21:28:31,409 - INFO - README fetch işlemi başlatıldı
+2025-08-15 21:28:31,409 - INFO - Hedef repo: https://github.com/ripienaar/free-for-dev
+2025-08-15 21:28:31,409 - INFO - Branch: main
+2025-08-15 21:28:31,409 - INFO - GitHub API'den README çekiliyor: https://api.github.com/repos/ripienaar/free-for-dev/readme
+2025-08-15 21:28:31,860 - INFO - README başarıyla alındı. Boyut: 295068 karakter
+2025-08-15 21:28:31,861 - INFO - README başarıyla kaydedildi: /mnt/ee8bf59b-815d-47bd-b440-5ba8ae82ff4a/projects/free-for-dev/README.md
+2025-08-15 21:28:31,861 - INFO - README fetch işlemi başarıyla tamamlandı

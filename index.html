@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>README to Bookmarks Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>README to Bookmarks Converter</h1>
+            <p class="subtitle">Markdown dosyalarınızı tarayıcı yer imleri formatına dönüştürün</p>
+        </header>
+
+        <main class="main-content">
+            <section class="description">
+                <h2>Proje Amacı</h2>
+                <p>Bu araç, markdown formatındaki README dosyalarınızı tarayıcılarda kullanılabilir yer imleri (bookmarks) formatına dönüştürür. Özellikle free-for-dev gibi büyük projelerdeki linkleri kolayca yer imlerinize ekleyebilirsiniz.</p>
+                
+                <div class="features">
+                    <h3>Özellikler:</h3>
+                    <ul>
+                        <li>Markdown dosyalarını otomatik olarak ayrıştırır</li>
+                        <li>Başlıkları kategori olarak kullanır</li>
+                        <li>Linkleri yer imlerine dönüştürür</li>
+                        <li>Oluşturulan HTML dosyasını indirilebilir hale getirir</li>
+                        <li>Tamamen responsive tasarım</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="converter-section">
+                <h2>Dönüştürme Aracı</h2>
+                
+                <div class="form-group">
+                    <label for="readme-file">README Dosyası Seçin:</label>
+                    <select id="readme-file" class="file-select">
+                        <option value="README.md">README.md (Varsayılan)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="output-file">Çıktı Dosya Adı:</label>
+                    <input type="text" id="output-file" class="file-input" value="bookmarks.html" placeholder="bookmarks.html">
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Yer İmleri Başlığı:</label>
+                    <input type="text" id="title" class="file-input" value="Bookmarks" placeholder="Bookmarks">
+                </div>
+
+                <div class="form-group">
+                    <label for="root-category">Ana Kategori Adı:</label>
+                    <input type="text" id="root-category" class="file-input" value="Free for Dev" placeholder="Free for Dev">
+                </div>
+
+                <button id="convert-btn" class="convert-btn" disabled>
+                    <span class="btn-text">Bookmarks Oluştur</span>
+                    <span class="loading-spinner" style="display: none;"></span>
+                </button>
+
+                <div id="progress-section" class="progress-section" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div id="log-messages" class="log-messages"></div>
+                </div>
+
+                <div id="result-section" class="result-section" style="display: none;">
+                    <div class="success-message">
+                        <h3>✅ İşlem Başarılı!</h3>
+                        <p>Bookmarks dosyası başarıyla oluşturuldu.</p>
+                    </div>
+                    <button id="download-btn" class="download-btn">
+                        📥 Bookmarks Dosyasını İndir
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 README to Bookmarks Converter. Basit ve kullanışlı bir dönüştürme aracı.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Node.js ortamında çalıştığımızı kontrol et
+        if (typeof module !== 'undefined' && module.exports) {
+            // Node.js ortamı
+            const fs = require('fs');
+            const { exec } = require('child_process');
+            const util = require('util');
+            const execPromise = util.promisify(exec);
+            
+            // Global olarak kullanılabilir kıl
+            global.require = require;
+            global.fs = fs;
+            global.exec = exec;
+            global.execPromise = execPromise;
+        }
+    </script>
+</body>
+</html>
