@@ -51,7 +51,7 @@ python convert_to_bookmarks.py -i README.md -o bookmarks.html -t "Bookmarks" -r 
 ## 📁 Dosya Yapısı
 
 ```
-free-for-dev-bookmarks-converter/
+markdown-bookmarks-converter/
 ├── README.md                    # Proje dokümantasyonu
 ├── convert_to_bookmarks.py      # Python dönüştürme betiği
 ├── index.html                   # Web arayüzü ana sayfası
@@ -171,7 +171,7 @@ Bu proje [MIT Lisansı](LICENSE) altında açık kaynaklıdır. Detaylar için [
 
 Sorularınız, önerileriniz veya hata bildirimleri için:
 - GitHub Issues üzerinden iletişime geçin
-- E-posta: [proje@example.com](mailto:proje@example.com)
+- E-posta: [cenktekin@duck.com](mailto:cenktekin@duck.com)
 
 ---
 
