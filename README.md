@@ -6,67 +6,73 @@
 
 Bu araç, [ripienaar/free-for-dev](https://github.com/ripienaar/free-for-dev) projesindeki gibi büyük README dosyalarını tarayıcı yer imleri (bookmarks) formatına dönüştürür.
 
+![Uygulama Önizleme](image.png)
+
 ## 🎯 Proje Amacı
 
 Markdown formatındaki büyük README dosyalarını, özellikle ücretsiz geliştirici kaynakları listelerini, tarayıcılarda kolayca kullanılabilir yer imleri formatına dönüştürür. Bu sayede yüzlerce linki düzenli bir şekilde yer imlerinize ekleyebilirsiniz.
 
 ## ✨ Özellikler
 
-- **Python Betiği**: Komut satırından veya betikle dönüştürme yapma
 - **Web Arayüzü**: Tarayıcı üzerinden kolayca kullanım
 - **Otomatik Ayrıştırma**: Markdown başlıklarını kategori olarak işler
 - **Link Çıkarma**: Markdown linklerini otomatik olarak yer imlerine dönüştürür
 - **Netscape Formatı**: Standart tarayıcı yer imleri formatı (HTML)
 - **Responsive Tasarım**: Mobil uyumlu web arayüzü
 - **Türkçe Desteği**: Türkçe karakter ve dil desteği
+- **Yerel Klasöre Kaydetme**: Chromium tabanlı tarayıcılarda çıktı dosyasını doğrudan klasöre kaydetme
+
+> Not: Komut satırı ile dönüştürme için Python tabanlı yardımcı betikler `tools/` klasöründedir (opsiyonel).
 
 ## 🚀 Kurulum ve Kullanım
 
-### Python Betiği ile Kullanım
+### (Opsiyonel) Python Betiği ile Kullanım
 
-1. Gerekli bağımlılıkları yükleyin:
+1. Betikler `tools/` klasöründe yer alır. Örnek kullanım:
 ```bash
-pip install -r requirements.txt  # Eğer varsa
+python tools/convert_to_bookmarks.py -i README.md -o bookmarks.html -t "Bookmarks" -r "Free for Dev"
 ```
-
-2. Betiği çalıştırın:
-```bash
-python convert_to_bookmarks.py -i README.md -o bookmarks.html -t "Bookmarks" -r "Free for Dev"
-```
-
-**Parametreler:**
-- `-i, --input`: Girdi markdown dosyası yolu (varsayılan: README.md)
-- `-o, --output`: Çıktı HTML dosyası yolu (varsayılan: bookmarks.html)
-- `-t, --title`: Yer imleri dosyası başlığı (varsayılan: Bookmarks)
-- `-r, --root-category`: Ana kategori adı (varsayılan: Free for Dev)
-- `-v, --verbose`: Detaylı çıktı modu
-- `-h, --help`: Yardım mesajı
 
 ### Web Arayüzü ile Kullanım
 
 1. Proje dosyalarını sunucuya veya yerel makinenize kopyalayın
 2. `index.html` dosyasını tarayıcınızda açın
-3. Kullanıcı arayüzünden dosya seçin ve dönüştürmeyi başlatın
+3. Kullanıcı arayüzünden README dosyasını seçin ve dönüştürmeyi başlatın
+4. İşlem tamamlanınca "💾 Klasöre Kaydet (Yerel)" butonuna tıklayın
+
+> Yerel klasöre kaydetme özelliği Chromium tabanlı tarayıcılarda (Chrome, Edge, Brave vb.) çalışır.
 
 ## 📁 Dosya Yapısı
 
 ```
 markdown-bookmarks-converter/
 ├── README.md                    # Proje dokümantasyonu
-├── convert_to_bookmarks.py      # Python dönüştürme betiği
 ├── index.html                   # Web arayüzü ana sayfası
 ├── script.js                    # Web arayüzü JavaScript kodu
 ├── style.css                    # Web arayüzü stilleri
-├── bookmarks.html               # Örnek çıktı dosyası
-├── test_*.md                    # Test dosyaları
-├── test_*.html                  # Test HTML dosyaları
-├── browser_compatibility_test.js # Tarayıcı uyumluluk testi
-├── mobile_compatibility_test.js # Mobil uyumluluk testi
-├── validate_output.js           # Çıktı doğrulama betiği
-├── generate_large_test.js       # Büyük test verisi oluşturma
-├── fetch_readme.py              # README dosyası indirme betiği
-├── fetch_readme.log             # Log dosyası
-└── logo.webp                    # Proje logosu
+├── image.png                    # README görseli
+├── logo.webp                    # Proje logosu
+├── samples/                     # Örnek çıktı dosyaları
+│   ├── bookmarks-latest.html
+│   ├── test_bookmarks.html
+│   ├── test_bookmarks2.html
+│   └── test_bookmarks_from_web.html
+├── tests/                       # Test girdileri ve betikleri
+│   ├── test_empty.md
+│   ├── test_invalid_format.txt
+│   ├── test_large.md
+│   ├── test_readme.md
+│   ├── test_special_chars.md
+│   ├── browser_compatibility_test.js
+│   ├── mobile_compatibility_test.js
+│   ├── validate_output.js
+│   ├── generate_large_test.js
+│   └── test_web_interface.js
+├── tools/                       # Yardımcı komut satırı betikleri
+│   ├── convert_to_bookmarks.py
+│   └── fetch_readme.py
+└── logs/
+    └── fetch_readme.log
 ```
 
 ## 🛠️ Teknik Detaylar
@@ -83,8 +89,8 @@ markdown-bookmarks-converter/
 - **Frontend**: Saf HTML, CSS ve JavaScript
 - **Responsive**: Mobil, tablet ve masaüstü uyumlu
 - **Progress Bar**: İşlem ilerlemesi göstergesi
-- **Log Sistemi**: Gerçek zamanlı işlem logları
-- **Dosya İndirme**: Oluşturulan HTML dosyasını indirme
+- **Konsol Logları**: İşlem logları geliştirici konsolunda
+- **Yerel Kaydetme**: Çıktıyı klasöre kaydetme (Chromium tabanlı tarayıcılarda)
 
 ### Test Dosyaları
 
@@ -102,9 +108,9 @@ markdown-bookmarks-converter/
 - Standart kütüphaneler (argparse, logging, re, sys, datetime, html, pathlib, typing)
 
 ### Web Arayüzü
-- Modern web tarayıcısı (Chrome, Firefox, Safari, Edge)
-- JavaScript etkin olmalı
-- UTF-8 karakter desteği
+- Modern web tarayıcısı
+- JavaScript etkin olmalı, UTF-8 desteği
+- Yerel klasöre kaydetme için Chromium tabanlı bir tarayıcı (Chrome, Edge, Brave vb.)
 
 ## 🔧 Örnek Kullanım Senaryoları
 
@@ -123,7 +129,7 @@ python convert_to_bookmarks.py -i projem/README.md -o projem-bookmarks.html -r "
 2. "README Dosyası Seçin" menüsünden dosyayı seçin
 3. Çıktı dosya adını ve başlığı belirleyin
 4. "Bookmarks Oluştur" butonuna tıklayın
-5. Oluşturulan dosyayı indirin
+5. "💾 Klasöre Kaydet (Yerel)" ile kaydedin (Chromium)
 
 ## 📊 Çıktı Örneği
 
