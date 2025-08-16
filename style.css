@@ -270,6 +270,16 @@ body {
     text-align: center;
 }
 
+/* Action buttons container */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
 .success-message h3 {
     color: #155724;
     margin-bottom: 10px;
@@ -375,6 +385,12 @@ body {
         font-size: 14px;
         border-radius: 6px;
         min-height: 44px;
+    }
+    .action-buttons {
+        gap: 10px;
+    }
+    .action-buttons .download-btn {
+        width: 100%;
     }
     
     .progress-section {

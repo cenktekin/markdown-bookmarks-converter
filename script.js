@@ -8,11 +8,12 @@ class BookmarksConverter {
     initializeElements() {
         // Form elemanları
         this.readmeFileSelect = document.getElementById('readme-file');
+        this.readmeUpload = document.getElementById('readme-upload');
         this.outputFileInput = document.getElementById('output-file');
         this.titleInput = document.getElementById('title');
         this.rootCategoryInput = document.getElementById('root-category');
         this.convertBtn = document.getElementById('convert-btn');
-        this.downloadBtn = document.getElementById('download-btn');
+        this.saveToFolderBtn = document.getElementById('save-to-folder-btn');
         
         // Durum elemanları
         this.progressSection = document.getElementById('progress-section');
@@ -26,28 +27,37 @@ class BookmarksConverter {
         
         // Oluşturulan dosya yolu
         this.generatedFilePath = '';
+        this.generatedContent = '';
+
+        // Yerel dosya durumu
+        this.localFileContent = null;
+        this.localFileName = null;
+
+        // Hedef klasör (File System Access API)
+        this.dirHandle = null;
     }
 
     bindEvents() {
         this.convertBtn.addEventListener('click', () => this.startConversion());
-        this.downloadBtn.addEventListener('click', () => this.downloadFile());
+        if (this.saveToFolderBtn) {
+            this.saveToFolderBtn.addEventListener('click', () => this.saveFileToFolder());
+        }
         
         // Form değişikliklerinde buton durumunu güncelle
         [this.readmeFileSelect, this.outputFileInput, this.titleInput, this.rootCategoryInput].forEach(element => {
             element.addEventListener('change', () => this.updateConvertButtonState());
             element.addEventListener('input', () => this.updateConvertButtonState());
         });
+
+        // Yerel dosya seçimini dinle
+        if (this.readmeUpload) {
+            this.readmeUpload.addEventListener('change', (e) => this.handleLocalFileSelect(e));
+        }
     }
 
     async discoverMarkdownFiles() {
-        try {
-            // Web ortamında mevcut markdown dosyalarını varsayılan olarak ayarla
-            const markdownFiles = ['README.md', 'test_readme.md', 'test_bookmarks.md', 'test_bookmarks2.md', 'test_invalid_format.txt', 'test_empty.md', 'test_special_chars.md', 'test_large.md'];
-            this.populateFileSelect(markdownFiles);
-        } catch (error) {
-            console.log('Dosya listesi alınamadı, varsayılan dosya kullanılacak:', error);
-            this.populateFileSelect(['README.md']);
-        }
+        // Sade liste: yalnızca kök dizindeki README.md
+        this.populateFileSelect(['README.md']);
     }
 
     populateFileSelect(files) {
@@ -70,8 +80,37 @@ class BookmarksConverter {
     }
 
     updateConvertButtonState() {
-        const hasInput = this.readmeFileSelect.value && this.outputFileInput.value.trim();
+        const hasAnyReadme = !!this.localFileContent || !!(this.readmeFileSelect && this.readmeFileSelect.value);
+        const hasInput = hasAnyReadme && this.outputFileInput.value.trim();
         this.convertBtn.disabled = !hasInput;
+    }
+
+    handleLocalFileSelect(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) {
+            this.localFileContent = null;
+            this.localFileName = null;
+            this.updateConvertButtonState();
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+            this.localFileContent = reader.result || '';
+            this.localFileName = file.name;
+            // Seçim kutusunu görsel olarak güncelle (bilgi amaçlı)
+            if (this.readmeFileSelect) {
+                // Değer aynı kalsın; yerel dosya öncelikli kullanılacak
+            }
+            this.addLog(`Yerel dosya seçildi: ${file.name} (${file.size} bayt)`, 'info');
+            this.updateConvertButtonState();
+        };
+        reader.onerror = () => {
+            this.localFileContent = null;
+            this.localFileName = null;
+            this.addLog('Yerel dosya okunamadı.', 'error');
+            this.updateConvertButtonState();
+        };
+        reader.readAsText(file);
     }
 
     async startConversion() {
@@ -95,13 +134,14 @@ class BookmarksConverter {
     }
 
     validateInputs() {
-        const readmeFile = this.readmeFileSelect.value;
+        const readmeFile = this.readmeFileSelect ? this.readmeFileSelect.value : '';
         const outputFile = this.outputFileInput.value.trim();
         const title = this.titleInput.value.trim();
         const rootCategory = this.rootCategoryInput.value.trim();
 
-        if (!readmeFile) {
-            this.addLog('Lütfen bir README dosyası seçin.', 'error');
+        // Yerel dosya varsa, seçim zorunlu değil
+        if (!this.localFileContent && !readmeFile) {
+            this.addLog('Lütfen bir README dosyası seçin veya yerel dosya yükleyin.', 'error');
             return false;
         }
 
@@ -125,7 +165,7 @@ class BookmarksConverter {
 
     getFormData() {
         return {
-            input: this.readmeFileSelect.value,
+            input: this.readmeFileSelect ? this.readmeFileSelect.value : '',
             output: this.outputFileInput.value.trim(),
             title: this.titleInput.value.trim(),
             rootCategory: this.rootCategoryInput.value.trim()
@@ -141,7 +181,10 @@ class BookmarksConverter {
             let readmeContent = '';
             
             // Seçilen dosyaya göre içerik belirle
-            if (formData.input === 'test_readme.md') {
+            if (this.localFileContent) {
+                readmeContent = this.localFileContent;
+                this.addLog(`Yerel dosya içeriği kullanılacak${this.localFileName ? `: ${this.localFileName}` : ''}`, 'info');
+            } else if (formData.input === 'test_readme.md') {
                 readmeContent = `# Test Projesi
 
 Bu bir test README dosyasıdır.
@@ -207,6 +250,7 @@ Bu metinlerde özel karakterler var: 123, @, #, $, %, ^, &, *, (, ), -, +, =, {,
 
             // README içeriğini işle ve HTML bookmarks oluştur
             const bookmarksContent = this.processReadmeToBookmarks(readmeContent, formData.title, formData.rootCategory);
+            this.generatedContent = bookmarksContent;
             
             this.addLog('HTML bookmarks dosyası oluşturuluyor...', 'info');
             this.updateProgress(70);
@@ -300,12 +344,7 @@ Bu metinlerde özel karakterler var: 123, @, #, $, %, ^, &, *, (, ), -, +, =, {,
     showSuccess() {
         this.progressSection.style.display = 'none';
         this.resultSection.style.display = 'block';
-        this.downloadBtn.style.display = 'inline-block';
-        
-        if (this.generatedFilePath) {
-            this.downloadBtn.onclick = () => this.downloadFile();
-        }
-    }
+      }
 
     showError(message) {
         this.addLog(`Hata: ${message}`, 'error');
@@ -324,16 +363,57 @@ Bu metinlerde özel karakterler var: 123, @, #, $, %, ^, &, *, (, ), -, +, =, {,
         this.resultSection.appendChild(errorDiv);
     }
 
-    downloadFile() {
-        if (this.generatedFilePath) {
-            const link = document.createElement('a');
-            link.href = this.generatedFilePath;
-            // Dosya adını çıktı dosya adından al
-            const fileName = this.outputFileInput.value.trim() || 'bookmarks.html';
-            link.download = fileName;
-            link.click();
+    async saveFileToFolder() {
+        try {
+            if (!this.generatedContent) {
+                this.addLog('Kaydedilecek içerik bulunamadı. Önce dönüştürme yapın.', 'error');
+                return;
+            }
+            const suggestedName = (this.outputFileInput.value.trim() || 'bookmarks.html').replace(/\s+/g, '_');
+            // Öncelikle bir hedef klasör seçildiyse oraya direkt yazalım
+            if (this.dirHandle && (await this.verifyDirPermission(this.dirHandle))) {
+                const fileHandle = await this.dirHandle.getFileHandle(suggestedName, { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(new Blob([this.generatedContent], { type: 'text/html;charset=utf-8' }));
+                await writable.close();
+                this.addLog(`Dosya klasöre kaydedildi: ${suggestedName}`, 'success');
+                return;
+            }
+
+            // Klasör seçilmemişse showSaveFilePicker deneyelim
+            if (window.showSaveFilePicker) {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName,
+                    types: [
+                        {
+                            description: 'HTML Bookmarks',
+                            accept: { 'text/html': ['.html', '.htm'] }
+                        }
+                    ]
+                });
+                const writable = await handle.createWritable();
+                await writable.write(new Blob([this.generatedContent], { type: 'text/html;charset=utf-8' }));
+                await writable.close();
+                this.addLog(`Dosya kaydedildi: ${handle.name}`, 'success');
+            } else {
+                // Destek yoksa normal indirme ile geri dön
+                this.addLog('Tarayıcı yerel kaydetmeyi desteklemiyor. Lütfen Chromium tabanlı bir tarayıcı kullanın.', 'error');
+                this.generatedFilePath = URL.createObjectURL(new Blob([this.generatedContent], { type: 'text/html;charset=utf-8' }));
+            }
+        } catch (err) {
+            this.addLog(`Klasöre kaydetme başarısız: ${err.message}`, 'error');
         }
     }
+
+    async verifyDirPermission(dirHandle) {
+        if (!dirHandle) return false;
+        const opts = { mode: 'readwrite' };
+        if (await dirHandle.queryPermission(opts) === 'granted') return true;
+        if (await dirHandle.requestPermission(opts) === 'granted') return true;
+        return false;
+    }
+
+    // Klasör etiketi yönetimi kaldırıldı (UI sadeleştirildi)
 
     setLoadingState(isLoading) {
         this.convertBtn.disabled = isLoading;
@@ -347,14 +427,7 @@ Bu metinlerde özel karakterler var: 123, @, #, $, %, ^, &, *, (, ), -, +, =, {,
 
     addLog(message, type = 'info') {
         const logEntry = document.createElement('div');
-        logEntry.className = `log-entry ${type}`;
-        
-        const timestamp = new Date().toLocaleTimeString('tr-TR');
-        logEntry.textContent = `[${timestamp}] ${message}`;
-        
-        this.logMessages.appendChild(logEntry);
-        this.logMessages.scrollTop = this.logMessages.scrollHeight;
-        
+       
         // Konsola da logla
         console.log(`[${type.toUpperCase()}] ${message}`);
     }
