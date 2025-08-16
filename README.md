@@ -12,6 +12,12 @@ Bu araç, [ripienaar/free-for-dev](https://github.com/ripienaar/free-for-dev) pr
 
 ![Uygulama Önizleme](./image.png)
 
+## 🔗 Demo
+
+Canlı demo (GitHub Pages):
+
+https://cenktekin.github.io/markdown-bookmarks-converter/
+
 ## 🎯 Proje Amacı
 
 Markdown formatındaki büyük README dosyalarını, özellikle ücretsiz geliştirici kaynakları listelerini, tarayıcılarda kolayca kullanılabilir yer imleri formatına dönüştürür. Bu sayede yüzlerce linki düzenli bir şekilde yer imlerinize ekleyebilirsiniz.
@@ -39,7 +45,7 @@ python tools/convert_to_bookmarks.py -i README.md -o bookmarks.html -t "Bookmark
 
 ### Web Arayüzü ile Kullanım
 
-1. Proje dosyalarını sunucuya veya yerel makinenize kopyalayın
+1. Proje dosyalarını sunucuya veya yerel makinenize kopyalayın (ya da doğrudan demoyu kullanın: https://cenktekin.github.io/markdown-bookmarks-converter/)
 2. `index.html` dosyasını tarayıcınızda açın
 3. Kullanıcı arayüzünden README dosyasını seçin ve dönüştürmeyi başlatın
 4. İşlem tamamlanınca "💾 Klasöre Kaydet (Yerel)" butonuna tıklayın
