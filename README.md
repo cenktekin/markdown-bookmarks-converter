@@ -7,6 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
 [![HTML/CSS/JS](https://img.shields.io/badge/HTML/CSS/JS-orange.svg)](https://developer.mozilla.org/)
+[![Release](https://img.shields.io/github/v/release/cenktekin/markdown-bookmarks-converter?display_name=tag)](https://github.com/cenktekin/markdown-bookmarks-converter/releases/latest)
 
 Bu araç, [ripienaar/free-for-dev](https://github.com/ripienaar/free-for-dev) projesindeki gibi büyük README dosyalarını tarayıcı yer imleri (bookmarks) formatına dönüştürür.
 
