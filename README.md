@@ -1,12 +1,16 @@
 # Free for Dev Bookmarks Converter
 
+<p align="center">
+  <img src="./8d053eb7-9be0-438f-af7b-a4573de30c47.png" alt="App Icon" width="96" height="96" />
+</p>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
 [![HTML/CSS/JS](https://img.shields.io/badge/HTML/CSS/JS-orange.svg)](https://developer.mozilla.org/)
 
 Bu araç, [ripienaar/free-for-dev](https://github.com/ripienaar/free-for-dev) projesindeki gibi büyük README dosyalarını tarayıcı yer imleri (bookmarks) formatına dönüştürür.
 
-![Uygulama Önizleme](image.png)
+![Uygulama Önizleme](./image.png)
 
 ## 🎯 Proje Amacı
 

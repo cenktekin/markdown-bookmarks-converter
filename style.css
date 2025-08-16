@@ -33,6 +33,16 @@ body {
     font-size: 2.5rem;
     margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 .subtitle {
