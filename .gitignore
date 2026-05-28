@@ -7,3 +7,8 @@ __VG_UUID_*
 
 # Images (generated screenshots)
 image.png
+
+# Environment variables
+.env
+.env.local
+.env.*.local
