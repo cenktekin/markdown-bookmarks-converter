@@ -1,0 +1,10 @@
+{
+  "name": "markdown-bookmarks-converter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Markdown README dosyalarını Netscape bookmarks (HTML) formatına dönüştürür.",
+  "scripts": {
+    "test": "node tests/browser_compatibility_test.js && node tests/mobile_compatibility_test.js && node tests/validate_output.js && node tests/test_web_interface.js && node tests/generate_large_test.js"
+  },
+  "license": "MIT"
+}

@@ -165,22 +165,7 @@
               </footer>
     </div>
 
+    <script src="converter.js"></script>
     <script src="script.js"></script>
-    <script>
-      // Node.js ortamında çalıştığımızı kontrol et
-      if (typeof module !== "undefined" && module.exports) {
-        // Node.js ortamı
-        const fs = require("fs");
-        const { exec } = require("child_process");
-        const util = require("util");
-        const execPromise = util.promisify(exec);
-
-        // Global olarak kullanılabilir kıl
-        global.require = require;
-        global.fs = fs;
-        global.exec = exec;
-        global.execPromise = execPromise;
-      }
-    </script>
   </body>
 </html>

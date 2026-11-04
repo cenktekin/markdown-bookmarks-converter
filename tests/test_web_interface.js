@@ -1,8 +1,8 @@
-// Web arayüzünü test etmek için basit bir betik
-const fs = require('fs');
+// Ortak dönüştürücünün davranış testleri
+const assert = require('assert');
 const path = require('path');
+const { processReadmeToBookmarks } = require(path.join(__dirname, '..', 'converter.js'));
 
-// Test için README içeriği
 const testReadmeContent = `# Test Projesi
 
 Bu bir test README dosyasıdır.
@@ -23,89 +23,74 @@ Bu bir test README dosyasıdır.
 - [MDN Web Docs](https://developer.mozilla.org)
 - [W3Schools](https://www.w3schools.com)`;
 
-// Test için HTML bookmarks formatı oluşturan fonksiyon
-function processReadmeToBookmarks(readmeContent, title, rootCategory) {
-    // HTML bookmarks formatı oluştur
-    let bookmarksHTML = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
-<!-- This is an automatically generated file.
-     It will be read and overwritten.
-     DO NOT EDIT! -->
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<TITLE>${title}</TITLE>
-<H1>${title}</H1>
-<DL><p>
-    <DT><H3 ADD_DATE="${Date.now()}" LAST_MODIFIED="${Date.now()}" PERSONAL_TOOLBAR_FOLDER="true">${rootCategory}</H3>
-    <DL><p>
-`;
+let failures = 0;
 
-    // README içeriğini satır satır işle
-    const lines = readmeContent.split('\n');
-    let currentCategory = '';
-    let inCodeBlock = false;
-    
-    for (let line of lines) {
-        line = line.trim();
-        
-        // Kod bloklarını atla
-        if (line.startsWith('```')) {
-            inCodeBlock = !inCodeBlock;
-            continue;
-        }
-        if (inCodeBlock) continue;
-        
-        // Başlık satırlarını kategori olarak ekle
-        if (line.startsWith('# ')) {
-            currentCategory = line.substring(2).trim();
-            bookmarksHTML += `        <DT><H3 ADD_DATE="${Date.now()}" LAST_MODIFIED="${Date.now()}">${currentCategory}</H3>\n`;
-            bookmarksHTML += `        <DL><p>\n`;
-        }
-        // Alt başlık satırlarını kategori olarak ekle
-        else if (line.startsWith('## ')) {
-            currentCategory = line.substring(3).trim();
-            bookmarksHTML += `        <DT><H3 ADD_DATE="${Date.now()}" LAST_MODIFIED="${Date.now()}">${currentCategory}</H3>\n`;
-            bookmarksHTML += `        <DL><p>\n`;
-        }
-        // Linkleri yer imi olarak ekle
-        else if (line.startsWith('- [') || line.startsWith('* [')) {
-            const linkMatch = line.match(/\[([^\]]+)\]\(([^)]+)\)/);
-            if (linkMatch) {
-                const linkText = linkMatch[1];
-                const linkUrl = linkMatch[2];
-                bookmarksHTML += `        <DT><A HREF="${linkUrl}" ADD_DATE="${Date.now()}" LAST_MODIFIED="${Date.now()}">${linkText}</A>\n`;
-            }
-        }
-        // Doğrudan linkleri ekle
-        else if (line.startsWith('http://') || line.startsWith('https://')) {
-            const linkText = line.replace(/^https?:\/\//, '').split('/')[0];
-            bookmarksHTML += `        <DT><A HREF="${line}" ADD_DATE="${Date.now()}" LAST_MODIFIED="${Date.now()}">${linkText}</A>\n`;
-        }
+function check(name, fn) {
+    try {
+        fn();
+        console.log(`  ✅ ${name}`);
+    } catch (error) {
+        failures++;
+        console.log(`  ❌ ${name}: ${error.message}`);
     }
-    
-    bookmarksHTML += `    </DL><p>\n</DL><p>\n</DL><p>`;
-    
-    return bookmarksHTML;
 }
 
-// Testi çalıştır
 console.log('Web arayüzü testi başlatılıyor...');
 
-// Test için HTML bookmarks oluştur
-const bookmarksContent = processReadmeToBookmarks(
-    testReadmeContent,
-    'Test Bookmarks',
-    'Test Kategori'
-);
+const html = processReadmeToBookmarks(testReadmeContent, 'Test Bookmarks', 'Test Kategori');
 
-// Test dosyasını kaydet
-const testOutputPath = path.join(__dirname, 'test_bookmarks_from_web.html');
-fs.writeFileSync(testOutputPath, bookmarksContent, 'utf8');
+check('Netscape DOCTYPE üretiliyor', () => {
+    assert.ok(html.startsWith('<!DOCTYPE NETSCAPE-Bookmark-file-1>'));
+});
 
-console.log(`✅ Test başarıyla tamamlandı!`);
-console.log(`📁 Oluşturulan dosya: ${testOutputPath}`);
-console.log(`📊 Dosya boyutu: ${fs.statSync(testOutputPath).size} bayt`);
+check('Kök kategori ve 3 bölüm kategorisi var', () => {
+    assert.strictEqual((html.match(/<DT><H3 /g) || []).length, 4);
+});
 
-// Oluşturulan dosyanın içeriğini kontrol et
-console.log('\n📋 Oluşturulan HTML bookmarks dosyasının içeriği:');
-console.log(bookmarksContent.substring(0, 500) + '...');
+check('7 link yer imine dönüşüyor', () => {
+    assert.strictEqual((html.match(/<DT><A HREF=/g) || []).length, 7);
+});
 
-console.log('\n🎉 Web arayüzü testi başarıyla tamamlandı!');
+check('DL etiketleri dengeli', () => {
+    const opened = (html.match(/<DL><p>/g) || []).length;
+    const closed = (html.match(/<\/DL><p>/g) || []).length;
+    assert.strictEqual(opened, closed);
+});
+
+check('Başlık ve kategori HTML escape ediliyor', () => {
+    const escaped = processReadmeToBookmarks(
+        '# <script>alert(1)</script>\n- [x](https://example.com)',
+        '</TITLE><script>alert("t")</script>',
+        '<img src=x onerror=alert(1)>'
+    );
+    assert.ok(!escaped.includes('<script>'));
+    assert.ok(escaped.includes('&lt;script&gt;'));
+    assert.ok(escaped.includes('&quot;t&quot;'));
+});
+
+check('# seviye-1 başlık da kategori üretiyor (orphan yok)', () => {
+    const single = processReadmeToBookmarks('# Ana Baslik\n- [Link](https://example.com)', 'T', 'R');
+    assert.ok(single.includes('>Ana Baslik</H3>'));
+});
+
+check('##/### hiyerarşisi iç içe açılıyor', () => {
+    const nested = processReadmeToBookmarks(
+        '## Ust\n- [A](https://a.example)\n### Alt\n- [B](https://b.example)',
+        'T',
+        'R'
+    );
+    const upperIndex = nested.indexOf('>Ust</H3>');
+    const lowerIndex = nested.indexOf('>Alt</H3>');
+    assert.ok(upperIndex > -1 && lowerIndex > upperIndex);
+    const between = nested.slice(upperIndex, lowerIndex);
+    assert.ok(between.includes('<DL><p>'));
+    assert.ok(!between.includes('</DL><p>'));
+});
+
+console.log('\n' + '='.repeat(50));
+if (failures === 0) {
+    console.log('🎉 Web arayüzü testleri başarılı');
+    process.exit(0);
+}
+console.log(`❌ ${failures} test başarısız`);
+process.exit(1);

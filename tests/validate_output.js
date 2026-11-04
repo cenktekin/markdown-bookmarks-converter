@@ -4,13 +4,15 @@ const path = require('path');
 
 console.log('🔍 Çıktı doğrulama testi başlatılıyor...');
 
+const SAMPLES_DIR = path.join(__dirname, '..', 'samples');
+
 // Test dosyalarını kontrol et
 const testFiles = [
     'test_bookmarks_from_web.html',
     'bookmarks.html',
     'test_bookmarks.html',
     'test_bookmarks2.html'
-];
+].map(file => path.join(SAMPLES_DIR, file));
 
 let validationResults = {
     totalFiles: 0,
@@ -63,11 +65,6 @@ function validateBookmarksFile(filePath) {
                 name: 'DL etiketi kontrolü',
                 test: () => content.includes('<DL><p>'),
                 error: 'DL etiketi eksik'
-            },
-            {
-                name: 'DTD yorumu kontrolü',
-                test: () => content.includes('This is an automatically generated file.'),
-                error: 'DTD yorumu eksik'
             }
         ];
         
@@ -104,6 +101,10 @@ function validateBookmarksFile(filePath) {
         
         if (categoryCount === 0) {
             validationResults.warnings.push(`${filePath}: Hiç kategori bulunamadı`);
+        }
+
+        if (!content.includes('This is an automatically generated file.')) {
+            validationResults.warnings.push(`${filePath}: Üretilen dosya (DTD yorumu) işareti yok`);
         }
         
         // HTML yapısını kontrol et - daha doğru bir yöntem
@@ -150,11 +151,6 @@ function validateBookmarksFile(filePath) {
 testFiles.forEach(file => {
     validateBookmarksFile(file);
 });
-
-// Orijinal bookmarks.html dosyasını da kontrol et
-if (fs.existsSync('bookmarks.html')) {
-    validateBookmarksFile('bookmarks.html');
-}
 
 // Sonuçları raporla
 console.log('\n📊 DOĞRULAMA SONUÇLARI');

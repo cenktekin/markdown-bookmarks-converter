@@ -4,13 +4,10 @@ GitHub'dan README.md dosyasını çeken betik
 free-for-dev projesi için düzenli güncelleme sağlar
 """
 
-import os
 import sys
 import requests
-import re
 import logging
 import argparse
-from datetime import datetime
 from urllib.parse import urlparse
 from pathlib import Path
 

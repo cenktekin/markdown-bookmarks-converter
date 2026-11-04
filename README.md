@@ -59,10 +59,12 @@ python tools/convert_to_bookmarks.py -i README.md -o bookmarks.html -t "Bookmark
 markdown-bookmarks-converter/
 ├── README.md                    # Proje dokümantasyonu
 ├── index.html                   # Web arayüzü ana sayfası
+├── converter.js                 # Markdown → bookmarks dönüştürücü (tarayıcı + Node)
 ├── script.js                    # Web arayüzü JavaScript kodu
 ├── style.css                    # Web arayüzü stilleri
 ├── image.png                    # README görseli
-├── logo.webp                    # Proje logosu
+├── package.json                 # npm test (smoke testler)
+├── .gitattributes               # LF satır sonu normalizasyonu
 ├── samples/                     # Örnek çıktı dosyaları
 │   ├── bookmarks-latest.html
 │   ├── test_bookmarks.html
@@ -91,7 +93,7 @@ markdown-bookmarks-converter/
 ### Python Betiği
 
 - **Girdi İşleme**: UTF-8 destekli markdown dosyası okuma
-- **Ayrıştırma**: Regex ile başlık ve link çıkarma
+- **Ayrıştırma**: Regex ile başlık (1–3 seviye) ve link çıkarma; başlıklar iç içe klasörlere dönüşür
 - **Çıktı Formatı**: Netscape bookmarks standardı
 - **Hata Yönetimi**: Kapsamlı hata yakalama ve loglama
 

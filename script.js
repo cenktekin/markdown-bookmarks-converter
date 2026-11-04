@@ -177,79 +177,27 @@ class BookmarksConverter {
         this.updateProgress(10);
 
         try {
-            // Web ortamında README dosyasını oku - test için sabit içerik
-            let readmeContent = '';
-            
-            // Seçilen dosyaya göre içerik belirle
-            if (this.localFileContent) {
-                readmeContent = this.localFileContent;
+            let readmeContent = this.localFileContent;
+
+            if (readmeContent != null) {
                 this.addLog(`Yerel dosya içeriği kullanılacak${this.localFileName ? `: ${this.localFileName}` : ''}`, 'info');
-            } else if (formData.input === 'test_readme.md') {
-                readmeContent = `# Test Projesi
-
-Bu bir test README dosyasıdır.
-
-## Web Servisleri
-
-- [Google](https://www.google.com)
-- [GitHub](https://github.com)
-- [Stack Overflow](https://stackoverflow.com)
-
-## Araçlar
-
-- [VS Code](https://code.visualstudio.com)
-- [Chrome](https://www.google.com/chrome)
-
-## Öğrenme Kaynakları
-
-- [MDN Web Docs](https://developer.mozilla.org)
-- [W3Schools](https://www.w3schools.com)`;
-            } else if (formData.input === 'test_invalid_format.txt') {
-                readmeContent = `Bu geçersiz bir formattadır.
-Gerçek markdown formatı değildir.
-
-# Başlık
-- [Link](https://example.com)
-Bu bir link değildir.
-
-## Alt Başlık
-Normal metin`;
-            } else if (formData.input === 'test_empty.md') {
-                readmeContent = '';
-            } else if (formData.input === 'test_special_chars.md') {
-                readmeContent = `# Özel Karakter Testi
-
-Bu bir başlıktır: Türkçe karakterler: ç, ğ, ı, ö, ş, ü
-
-## Linkler
-- [Google](https://www.google.com/search?q=türkçe+arama)
-- [GitHub](https://github.com/özeldosya)
-- [Stack Overflow](https://stackoverflow.com/questions?q=javascript)
-
-### Özel URL'ler
-- [URL with spaces](https://example.com/path with spaces/file.html)
-- [URL with params](https://example.com/test?param1=value1&param2=value2)
-- [URL with hash](https://example.com/page#section1)
-
-## Metinler
-Bu metinlerde özel karakterler var: 123, @, #, $, %, ^, &, *, (, ), -, +, =, {, }, [, ], |, \\, :, ;, ", ', <, >, ,, ., /, ?, ~, \``;
-            } else if (formData.input === 'README.md') {
-                // README.md dosyasının içeriğini oku
-                const response = await fetch('/README.md');
-                if (response.ok) {
-                    readmeContent = await response.text();
-                } else {
+            } else {
+                const response = await fetch('./README.md');
+                if (!response.ok) {
                     throw new Error('README.md dosyası okunamadı');
                 }
-            } else {
-                throw new Error(`Desteklenmeyen dosya: ${formData.input}`);
+                readmeContent = await response.text();
             }
-            
+
             this.addLog('README dosyası başarıyla okundu', 'success');
             this.updateProgress(30);
 
             // README içeriğini işle ve HTML bookmarks oluştur
-            const bookmarksContent = this.processReadmeToBookmarks(readmeContent, formData.title, formData.rootCategory);
+            const bookmarksContent = window.MarkdownBookmarks.processReadmeToBookmarks(
+                readmeContent,
+                formData.title,
+                formData.rootCategory
+            );
             this.generatedContent = bookmarksContent;
             
             this.addLog('HTML bookmarks dosyası oluşturuluyor...', 'info');
@@ -266,69 +214,6 @@ Bu metinlerde özel karakterler var: 123, @, #, $, %, ^, &, *, (, ), -, +, =, {,
             this.addLog(`Dönüştürme sırasında hata oluştu: ${error.message}`, 'error');
             throw new Error(`Dönüştürme sırasında hata oluştu: ${error.message}`);
         }
-    }
-
-    processReadmeToBookmarks(readmeContent, title, rootCategory) {
-        // HTML bookmarks formatı oluştur - Netscape standardına uygun
-        const timestamp = Math.floor(Date.now() / 1000); // Unix timestamp
-        let bookmarksHTML = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
-<!-- This is an automatically generated file.
-     It will be read and overwritten.
-     DO NOT EDIT! -->
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<TITLE>${title}</TITLE>
-<H1>${title}</H1>
-<DL><p>
-    <DT><H3 ADD_DATE="${timestamp}" LAST_MODIFIED="${timestamp}" PERSONAL_TOOLBAR_FOLDER="true">${rootCategory}</H3>
-    <DL><p>
-`;
-
-        // README içeriğini satır satır işle
-        const lines = readmeContent.split('\n');
-        let currentCategory = '';
-        let inCodeBlock = false;
-        
-        for (let line of lines) {
-            line = line.trim();
-            
-            // Kod bloklarını atla
-            if (line.startsWith('```')) {
-                inCodeBlock = !inCodeBlock;
-                continue;
-            }
-            if (inCodeBlock) continue;
-            
-            // Başlık satırlarını kategori olarak ekle
-            if (line.startsWith('# ')) {
-                currentCategory = line.substring(2).trim();
-                bookmarksHTML += `        <DT><H3 ADD_DATE="${timestamp}" LAST_MODIFIED="${timestamp}">${currentCategory}</H3>\n`;
-                bookmarksHTML += `        <DL><p>\n`;
-            }
-            // Alt başlık satırlarını kategori olarak ekle
-            else if (line.startsWith('## ')) {
-                currentCategory = line.substring(3).trim();
-                bookmarksHTML += `        <DT><H3 ADD_DATE="${timestamp}" LAST_MODIFIED="${timestamp}">${currentCategory}</H3>\n`;
-                bookmarksHTML += `        <DL><p>\n`;
-            }
-            // Linkleri yer imi olarak ekle
-            else if (line.startsWith('- [') || line.startsWith('* [')) {
-                const linkMatch = line.match(/\[([^\]]+)\]\(([^)]+)\)/);
-                if (linkMatch) {
-                    const linkText = linkMatch[1];
-                    const linkUrl = linkMatch[2];
-                    bookmarksHTML += `        <DT><A HREF="${linkUrl}" ADD_DATE="${timestamp}" LAST_MODIFIED="${timestamp}">${linkText}</A>\n`;
-                }
-            }
-            // Doğrudan linkleri ekle
-            else if (line.startsWith('http://') || line.startsWith('https://')) {
-                const linkText = line.replace(/^https?:\/\//, '').split('/')[0];
-                bookmarksHTML += `        <DT><A HREF="${line}" ADD_DATE="${timestamp}" LAST_MODIFIED="${timestamp}">${linkText}</A>\n`;
-            }
-        }
-        
-        bookmarksHTML += `    </DL><p>\n</DL><p>\n</DL><p>`;
-        
-        return bookmarksHTML;
     }
 
     showProgress() {
@@ -353,12 +238,17 @@ Bu metinlerde özel karakterler var: 123, @, #, $, %, ^, &, *, (, ), -, +, =, {,
         
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
-        errorDiv.innerHTML = `
-            <h3>❌ İşlem Başarısız!</h3>
-            <p>${message}</p>
-            <button onclick="location.reload()" class="retry-btn">Tekrar Dene</button>
-        `;
-        
+
+        const heading = document.createElement('h3');
+        heading.textContent = '❌ İşlem Başarısız!';
+        const paragraph = document.createElement('p');
+        paragraph.textContent = message;
+        const retryButton = document.createElement('button');
+        retryButton.className = 'retry-btn';
+        retryButton.textContent = 'Tekrar Dene';
+        retryButton.addEventListener('click', () => location.reload());
+
+        errorDiv.append(heading, paragraph, retryButton);
         this.resultSection.innerHTML = '';
         this.resultSection.appendChild(errorDiv);
     }
@@ -427,8 +317,14 @@ Bu metinlerde özel karakterler var: 123, @, #, $, %, ^, &, *, (, ), -, +, =, {,
 
     addLog(message, type = 'info') {
         const logEntry = document.createElement('div');
-       
-        // Konsola da logla
+        logEntry.className = `log-entry ${type}`;
+        logEntry.textContent = message;
+
+        if (this.logMessages) {
+            this.logMessages.appendChild(logEntry);
+            this.logMessages.scrollTop = this.logMessages.scrollHeight;
+        }
+
         console.log(`[${type.toUpperCase()}] ${message}`);
     }
 }

@@ -1,4 +1,6 @@
 const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
 console.log('Büyük test dosyası oluşturuluyor...');
 
@@ -46,20 +48,29 @@ content += 'Bu dosya, performans testi için büyük bir içerik içerir.\n\n';
 for (let i = 0; i < 1000; i++) {
     const category = categories[Math.floor(Math.random() * categories.length)];
     content += `## ${category} ${i + 1}\n\n`;
-    
+
     // Her kategori için 10 link ekle
     for (let j = 0; j < 10; j++) {
         const link = links[Math.floor(Math.random() * links.length)];
         const title = `Link ${i + 1}-${j + 1}`;
         content += `- [${title}](${link})\n`;
     }
-    
+
     content += '\n';
 }
 
-// Dosyayı yaz
-fs.writeFileSync('test_large.md', content, 'utf8');
+// Depoyu kirletmemek için geçici dizine yaz
+const outputPath = path.join(os.tmpdir(), 'markdown-bookmarks-test_large.md');
+fs.writeFileSync(outputPath, content, 'utf8');
 
-console.log('Büyük test dosyası oluşturuldu: test_large.md');
-console.log(`Dosya boyutu: ${fs.statSync('test_large.md').size} bayt`);
-console.log(`Satır sayısı: ${content.split('\n').length}`);
+const lineCount = content.split('\n').length;
+console.log(`Büyük test dosyası oluşturuldu: ${outputPath}`);
+console.log(`Dosya boyutu: ${fs.statSync(outputPath).size} bayt`);
+console.log(`Satır sayısı: ${lineCount}`);
+
+if (lineCount < 10000) {
+    console.error('❌ Beklenen satır sayısına ulaşılamadı');
+    process.exit(1);
+}
+
+console.log('✅ Büyük test dosyası doğrulandı');

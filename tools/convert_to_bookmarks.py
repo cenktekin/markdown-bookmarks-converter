@@ -23,7 +23,7 @@ import sys
 from datetime import datetime
 from html import escape
 from pathlib import Path
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple
 
 
 def setup_logging(verbose: bool = False) -> None:
@@ -166,50 +166,54 @@ def create_bookmark_html(
     Returns:
         HTML içeriği
     """
+    timestamp = generate_timestamp()
     html_lines = [
         '<!DOCTYPE NETSCAPE-Bookmark-file-1>',
         '<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">',
         f'<TITLE>{escape(title)}</TITLE>',
         '<H1>Bookmarks</H1>',
         '<DL><p>',
-        f'<DT><H3 ADD_DATE="{generate_timestamp()}" LAST_MODIFIED="{generate_timestamp()}" PERSONAL_TOOLBAR_FOLDER="true">{escape(root_category)}</H3>',
+        f'<DT><H3 ADD_DATE="{timestamp}" LAST_MODIFIED="{timestamp}" PERSONAL_TOOLBAR_FOLDER="true">{escape(root_category)}</H3>',
         '<DL><p>'
     ]
-    
+
+    # Açık kategori klasörlerinin başlık seviyeleri (yuvalama için yığın)
+    open_levels = []
+
     for section in sections:
         section_title = section['title']
-        section_content = section['content']
         level = section['level']
-        
-        # Boş kategorileri atla
-        if not section_content.strip():
-            logging.debug(f"Boş kategori atlanıyor: {section_title}")
-            continue
-        
-        # Linkleri çıkar
-        links = extract_links_from_content(section_content)
-        
+
+        # Aynı veya daha derin klasörleri kapat
+        while open_levels and open_levels[-1] >= level:
+            html_lines.append('</DL><p>')
+            open_levels.pop()
+
+        links = extract_links_from_content(section['content'])
+
         if not links:
             logging.debug(f"Link içermeyen kategori atlanıyor: {section_title}")
             continue
-        
-        # Kategori başlığını ekle
-        if level == 2:  ## Ana kategori
-            html_lines.append(f'<DT><H3 ADD_DATE="{generate_timestamp()}" LAST_MODIFIED="{generate_timestamp()}">{escape(section_title)}</H3>')
-        elif level == 3:  ### Alt kategori
-            html_lines.append(f'<DT><H3 ADD_DATE="{generate_timestamp()}" LAST_MODIFIED="{generate_timestamp()}" FOLDER="true">{escape(section_title)}</H3>')
-        
+
+        html_lines.append(
+            f'<DT><H3 ADD_DATE="{timestamp}" LAST_MODIFIED="{timestamp}">{escape(section_title)}</H3>'
+        )
         html_lines.append('<DL><p>')
-        
-        # Linkleri ekle
+        open_levels.append(level)
+
         for link_title, link_url in links:
-            html_lines.append(f'<DT><A HREF="{escape(link_url)}" ADD_DATE="{generate_timestamp()}">{escape(link_title)}</A>')
-        
+            html_lines.append(
+                f'<DT><A HREF="{escape(link_url)}" ADD_DATE="{timestamp}">{escape(link_title)}</A>'
+            )
+
+    while open_levels:
         html_lines.append('</DL><p>')
-    
-    # Kapanış etiketleri
-    html_lines.append('</DL><p></DL><p>')
-    
+        open_levels.pop()
+
+    # Kök klasörün ve üst listenin kapanışı
+    html_lines.append('</DL><p>')
+    html_lines.append('</DL><p>')
+
     return '\n'.join(html_lines)
 
 
