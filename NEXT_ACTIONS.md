@@ -6,16 +6,34 @@
 
 ## Son Tur
 
+- **Tarih:** 2026-11-18 · **Mod:** 2 haftalık kontrol (R1–R6 icra)
+- **Skor:** 59/100 (17.10) → **85/100** (18.11, resmî ölçüm · Ledger APPEND)
+- **Hüküm:** R1–R6'nın tamamı kapandı. Repo push edildi, CI regresyon kapısı yeşil, canlı demo gerçek tarayıcıda (CDP) uçtan uca doğrulandı.
+- **Repo:** `main @ 9eac30a` · `HEAD==origin/main` · ağaç temiz
+
+## Önceki Tur
+
 - **Tarih:** 2026-11-04 · **Mod:** onarım turu (tam orta)
-- **Önceki skor:** 59/100 (17.10.2026) · **Tahmini yeni skor:** ~80/100 (resmî ölçüm bekliyor)
+- **Skor:** 59/100 (17.10.2026) · **Tahmini:** ~80/100
 - **Hüküm:** T1–T8'in tamamı kapandı. `npm test` yeşil (exit 0), Python CLI yuvalamalı ve etiket-dengeli çıktı üretiyor.
 
 ## Referanslar
 
-- **Ledger bölümü:** `MASTER_PROJECT_LEDGER.md` → `### markdown-bookmarks-converter` (04.11.2026 onarım turu APPEND)
+- **Ledger bölümü:** `MASTER_PROJECT_LEDGER.md` → `2026-11-18 — 2. tur · markdown-bookmarks-converter`
 - **Joplin not:** Teknik Notlar, id `44292c71b48b45f58058e0ab6d5400b5`
-- **TickTick task:** 👨‍💻Teknik İşler — 04.11.2026 kontrolü kapatıldı, 18.11.2026 yeni kontrol açıldı
+- **TickTick task:** `6aead9208f08fc8c028f4a82` (kapandı 18.11.2026) → sonraki kontrol **02.12.2026**
 - **Kardeş proje (sinaps):** `bookmark-parser` (ters yön: bookmark HTML → README; **kod/şema paylaşımı YOK**)
+
+## Kapanan Kalemler (18.11.2026)
+
+| # | Sonuç | Kanıt |
+|---|-------|-------|
+| R1 | ✅ Push | `b6df245..9eac30a`; `rev-list --left-right --count origin/main...HEAD` → `0 0`; pre-commit secret hook temiz |
+| R2 | ✅ Pages demo smoke | Edge headless + CDP: `./README.md` fetch 200 → `#log-messages` 4 canlı mesaj → `#result-section` block, konsol hatası yok; `og:image` 200 (214.204 B, yerel ile birebir) |
+| R3 | ✅ CI test job | `.github/workflows/ci.yml`: `npm test` + Python CLI kapısı (DOCTYPE, DTD işareti, `DL` dengesi); ilk koşu **success** (run `44301037819`) |
+| R4 | ✅ samples yeniden üretildi | Kök neden: Python üretici Netscape DTD yorum bloğunu basmıyordu (JS basıyordu). Üretici hizalandı → validator **uyarı 2 → 0** |
+| R5 | ✅ Resmî skor | 59 → **85** (6 eksen, basit ortalama); Ledger'a APPEND |
+| R6 | ✅ Emoji notları | "Playwright" → `node:assert`+`npm test` (framework yok); "8 test dosyası" → **11** (5 script + 6 fixture); ağaç `converter.js`/`ci.yml` ile hizalandı |
 
 ## Kapanan Kalemler (04.11.2026)
 
@@ -38,24 +56,18 @@ npm test
 python tools/convert_to_bookmarks.py -i tests/test_readme.md -o bookmarks.html
 ```
 
-## AÇIK KALEMLER (yeni tur — 18.11.2026)
+## AÇIK KALEMLER
 
-| # | Kalem | Efor | Neden |
-|---|-------|------|-------|
-| R1 | **Commit + push** (yerel commit atıldıysa yalnız push) | XS | T3/T6 etkisi ancak push sonrası canlı demoda görünür |
-| R2 | Pages demo duman testi | S | `./README.md` ve `og:image` gerçek tarayıcıda doğrulanmadı (bu ortamda tarayıcı yok) |
-| R3 | CI'ya `npm test` job'u ekle | S | Mevcut `deploy-pages.yml` yalnız deploy ediyor; regresyon kapısı yok |
-| R4 | `samples/*.html` yeniden üret | S | İki örnek dosyada üretim işareti (DTD yorumu) yok; validator uyarı veriyor |
-| R5 | Resmî skor ölçümü | S | `/proje-denetim D:\projects\markdown-bookmarks-converter tam orta` → Ledger'a yeni sayı |
-| R6 | Emoji notları güncelle | XS | Notlar hâlâ "Playwright" ve "8 test dosyası" diyor; gerçek: 11 dosya, framework yok |
+Yok — R1–R6 (18.11.2026) ve T1–T8 (04.11.2026) tamamı kapandı. Kalan maddeler yalnız ERTELENEN/REDDEDİLEN listesinde.
 
 ## ERTELENEN
 
 - XML (Firefox) / YAML export — Efor M, net talep yok, Netscape HTML zaten Firefox uyumlu
 - Batch işleme, kategori dahil/hariç filtreleme, dönüşüm öncesi önizleme — Efor M-L
-- Gerçek test framework (vitest/jest) + assertion'lı birim testleri — Efor M
+- Gerçek test framework (vitest/jest) + assertion'lı birim testleri ve kapsam ölçümü — Efor M
 - `samples/README.md` (290 KB vendored free-for-dev) — arşive taşıma düşünülebilir (Efor S)
 - Standart doküman seti (PROJECT_TRACKER / TECHNICAL_NOTES / USER_GUIDE / project_state.json) — Efor M
+- Ölçü limit aşımlarının bölünmesi — `create_bookmark_html` 68, `main` 74 (Python), `style.css` 511 satır (Efor S)
 
 ## REDDEDİLEN
 
