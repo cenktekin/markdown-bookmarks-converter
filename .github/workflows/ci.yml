@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run smoke tests
+        run: npm test
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify Python CLI output
+        run: |
+          python tools/convert_to_bookmarks.py -i tests/test_readme.md -o /tmp/bookmarks.html
+          test -s /tmp/bookmarks.html
+          grep -q '<!DOCTYPE NETSCAPE-Bookmark-file-1>' /tmp/bookmarks.html
+          grep -q 'This is an automatically generated file.' /tmp/bookmarks.html
+          python - <<'PY'
+          from pathlib import Path
+          html = Path('/tmp/bookmarks.html').read_text(encoding='utf-8')
+          opened = html.count('<DL><p>')
+          closed = html.count('</DL><p>')
+          assert opened == closed, f'DL unbalanced: {opened} opened vs {closed} closed'
+          print(f'DL balanced: {opened}/{closed}')
+          PY

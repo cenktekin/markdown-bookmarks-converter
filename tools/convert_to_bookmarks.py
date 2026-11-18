@@ -169,6 +169,9 @@ def create_bookmark_html(
     timestamp = generate_timestamp()
     html_lines = [
         '<!DOCTYPE NETSCAPE-Bookmark-file-1>',
+        '<!-- This is an automatically generated file.',
+        '     It will be read and overwritten.',
+        '     DO NOT EDIT! -->',
         '<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">',
         f'<TITLE>{escape(title)}</TITLE>',
         '<H1>Bookmarks</H1>',
